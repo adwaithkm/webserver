@@ -11,15 +11,13 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Directly pass the API key for testing (use this only for testing, remove for production)
-client = Groq(api_key='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')  # Replace with your actual API key
-
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))  # Replace with your actual API key
 
 # Serve the index.html file
 @app.get("/", response_class=HTMLResponse)
 async def read_index():
     with open("static/index.html") as f:
         return f.read()
-
 
 # Endpoint to generate code using Groq
 @app.post("/generate_code/")
@@ -48,6 +46,10 @@ async def generate_code(request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Root endpoint
+@app.get("/")
+async def read_root():
+    return {"message": "Welcome to my FastAPI application!"}
 
 if __name__ == "__main__":
     import uvicorn
